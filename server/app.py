@@ -162,6 +162,7 @@ def add_proposal(text, key):
 
 
 def vote_proposal(proposal_id, key, delta):
+    if not allowed(key, f'vote:{proposal_id}', 86400, 1): return {'error': 'You already voted on this proposal. Try again tomorrow.'}
     delta = 1 if int(delta) > 0 else -1
     with LOCK:
         conn = db(); cur = conn.execute('UPDATE proposals SET votes=votes+? WHERE id=? AND status != "pruned"', (delta, int(proposal_id))); conn.commit(); conn.close()

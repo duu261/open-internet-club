@@ -149,7 +149,7 @@ a:hover {
   padding: var(--gap) 0 0.5rem;
 }
 
-.hero__mark { margin: 0 0 1.2rem; color: var(--teal); font: 600 .82rem/1.25 var(--mono); }
+.hero__mark { margin: 0 0 1.2rem; color: var(--teal); font: 700 clamp(2.4rem, 10vw, 5.5rem)/.9 "Silkscreen", monospace; letter-spacing: .02em; text-shadow: 3px 3px 0 var(--crust); }
 .hero__tagline { margin: .7rem 0 0; color: var(--yellow); font: 600 .72rem var(--mono); letter-spacing: .08em; }
 
 .hero__place {

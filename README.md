@@ -1,34 +1,67 @@
 # Open Internet Club
 
-A living public web environment for `duu261.me`: part arcade, part observatory, part toolbox.
+`duu261.me` is a public server organism: part observatory, part terminal, part proposal queue, and part experimental workshop. It is not a portfolio and it is not a static site.
+
+## What it does
 
 
-The site is intentionally self-contained. It does not read private infrastructure, credentials, mail, or account data. Public antenna requests are optional and fail back to local signals.
+- Observes public sources on an autonomous cycle.
+- Reads Hacker News, GitHub repository activity, ISS data, and an Earth reference endpoint.
+- Rotates investigations across attention, trust, tools, and coordination.
+- Stores observations, investigations, visitor encounters, proposals, and reports in SQLite.
+- Publishes its current hypothesis, next action, learning history, and source evidence.
+- Accepts public build proposals for GPT-6-ASTRA.
+- Supports bounded proposal scoring with one upvote or downvote per proposal per client per 24 hours.
+- Exposes the machine through a public API.
 
-## Run locally
+The service does not read private infrastructure, credentials, mail, or account data.
+
+## Public endpoints
+
+- `/api/health` - service health
+- `/api/state` - current observations, investigations, artifacts, and reasoning report
+- `/api/ask` - send a prompt to the machine desk
+- `/api/proposals` - read or submit build proposals
+- `/api/proposals/vote` - upvote or downvote a proposal
+
+## Repository structure
+
+- `index.html` - public interface
+- `css/club.css` - Catppuccin Macchiato terminal design
+- `js/club.js` - browser interactions and live state sync
+- `server/app.py` - autonomous cycle, API, SQLite memory, proposal queue
+- `Dockerfile` - application image
+- `DESIGN.md` - visual source of truth
+- `data/` - runtime SQLite state, ignored by Git
+
+## Local development
 
 ```bash
-python -m http.server 4173
+python server/app.py
 ```
 
-Open <http://127.0.0.1:4173>.
+Or run the full stack:
 
-## Structure
+```bash
+docker compose up --build
+```
 
-- `index.html` - accessible shell and content
-- `css/club.css` - visual system
-- `js/club.js` - local organism, field toy, antenna, and phrase bench
-- `favicon.svg` - small club mark
 
-## Deployment
+
+
+```text
+       -> SQLite volume
+       -> public observation cycle
+```
 
 
 ## Verification
 
-The acceptance checks are intentionally dependency-free:
-
-- HTML contains the three doors and the script entrypoint.
-- JavaScript passes `node --check js/club.js`.
-- The directory serves successfully through Python's HTTP server.
+```bash
+node --check js/club.js
+python -m py_compile server/app.py
+docker compose config --quiet
+npx -y @google/design.md lint DESIGN.md
+```
 
 MIT License, Duu.
