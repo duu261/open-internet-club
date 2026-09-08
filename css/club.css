@@ -1,17 +1,25 @@
 :root {
-  --harbor: #142833;
-  --harbor-lift: #1b3342;
-  --fog: #d2e0e6;
-  --brass: #c7923e;
-  --lagoon: #3aa6b4;
-  --ember: #d4654a;
-  --rule: #2c4a58;
-  --mute: #8aa0aa;
-  --bone: #f3eee4;
-  --ink: #0f1c24;
-  --display: "Big Shoulders Display", "Arial Narrow", sans-serif;
-  --serif: "Source Serif 4", Georgia, serif;
-  --mono: "Spline Sans Mono", ui-monospace, monospace;
+  --base: #24273a;
+  --mantle: #1e2030;
+  --crust: #181926;
+  --surface0: #363a4f;
+  --surface1: #494d64;
+  --text: #cad3f5;
+  --subtext: #a5adcb;
+  --blue: #8aadf4;
+  --sapphire: #7dc4e4;
+  --teal: #8bd5ca;
+  --green: #a6da95;
+  --yellow: #eed49f;
+  --peach: #f5a97f;
+  --red: #ed8796;
+  --rule: #494d64;
+  --mute: #8087a2;
+  --bone: #cad3f5;
+  --ink: #181926;
+  --display: "Fira Sans Condensed", "Fira Sans", sans-serif;
+  --serif: "Fira Sans", system-ui, sans-serif;
+  --mono: "Fira Code", ui-monospace, monospace;
   --gap: clamp(1.25rem, 3vw, 2.5rem);
   --page: min(72rem, calc(100% - 2rem));
 }
@@ -23,8 +31,8 @@
 }
 
 html {
-  background: var(--harbor);
-  color: var(--fog);
+  background: var(--base);
+  color: var(--text);
   scroll-behavior: smooth;
 }
 
@@ -37,7 +45,7 @@ body {
   line-height: 1.55;
   background:
     radial-gradient(1200px 480px at 8% -10%, #1e3d4c 0%, transparent 58%),
-    linear-gradient(180deg, #101f28 0%, var(--harbor) 18%);
+    linear-gradient(180deg, #101f28 0%, var(--base) 18%);
 }
 
 img,
@@ -53,15 +61,15 @@ textarea {
 }
 
 a {
-  color: var(--lagoon);
+  color: var(--teal);
 }
 
 a:hover {
-  color: var(--bone);
+  color: var(--text);
 }
 
 :focus-visible {
-  outline: 2px solid var(--brass);
+  outline: 2px solid var(--yellow);
   outline-offset: 3px;
 }
 
@@ -83,8 +91,8 @@ a:hover {
   top: 0;
   z-index: 20;
   transform: translateY(-140%);
-  background: var(--brass);
-  color: var(--ink);
+  background: var(--yellow);
+  color: var(--crust);
   padding: 0.45rem 0.8rem;
   text-decoration: none;
   font-family: var(--mono);
@@ -107,21 +115,21 @@ a:hover {
   font-family: var(--mono);
   font-size: 0.75rem;
   letter-spacing: 0.02em;
-  color: var(--mute);
+  color: var(--subtext);
 }
 
 .status__pulse {
   width: 0.55rem;
   height: 0.55rem;
   margin: 0;
-  background: var(--brass);
+  background: var(--yellow);
   animation: pulse 2.8s ease-in-out infinite;
 }
 
 .status__line {
   margin: 0;
   flex: 1 1 16rem;
-  color: var(--fog);
+  color: var(--text);
 }
 
 .status__hint {
@@ -147,7 +155,7 @@ a:hover {
   margin: 0 0 0.35rem;
   font-family: var(--mono);
   font-size: 0.78rem;
-  color: var(--lagoon);
+  color: var(--teal);
 }
 
 .hero h1 {
@@ -157,7 +165,7 @@ a:hover {
   font-size: clamp(3rem, 11vw, 7.5rem);
   line-height: 0.86;
   letter-spacing: -0.03em;
-  color: var(--bone);
+  color: var(--text);
   text-transform: uppercase;
 }
 
@@ -171,7 +179,7 @@ a:hover {
 .hero__why {
   max-width: 36rem;
   margin: 0;
-  color: var(--mute);
+  color: var(--subtext);
 }
 
 .doors {
@@ -202,30 +210,30 @@ a:hover {
   line-height: 0.9;
   letter-spacing: -0.03em;
   text-transform: uppercase;
-  color: var(--fog);
+  color: var(--text);
 }
 
 .door__blurb {
   font-size: 0.98rem;
-  color: var(--mute);
+  color: var(--subtext);
 }
 
 .door:hover .door__name,
 .door:focus-visible .door__name,
 .door[aria-pressed="true"] .door__name {
-  color: var(--brass);
+  color: var(--yellow);
 }
 
 .door[data-door="watch"]:hover .door__name,
 .door[data-door="watch"]:focus-visible .door__name,
 .door[data-door="watch"][aria-pressed="true"] .door__name {
-  color: var(--lagoon);
+  color: var(--teal);
 }
 
 .door[data-door="use"]:hover .door__name,
 .door[data-door="use"]:focus-visible .door__name,
 .door[data-door="use"][aria-pressed="true"] .door__name {
-  color: var(--ember);
+  color: var(--red);
 }
 
 .signals {
@@ -243,7 +251,7 @@ a:hover {
   font-family: var(--mono);
   font-size: 0.78rem;
   font-weight: 500;
-  color: var(--brass);
+  color: var(--yellow);
 }
 
 .signals__note,
@@ -251,7 +259,7 @@ a:hover {
 .chamber__lede,
 .panel__head p {
   margin: 0 0 0.85rem;
-  color: var(--mute);
+  color: var(--subtext);
   max-width: 40rem;
 }
 
@@ -261,8 +269,31 @@ a:hover {
   border-top: 1px solid var(--rule);
   font-family: var(--mono);
   font-size: 0.92rem;
-  color: var(--fog);
+  color: var(--text);
 }
+
+.agent-report {
+  width: var(--page);
+  margin: 2rem auto 0;
+  display: grid;
+  grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr);
+  gap: 1rem;
+  padding: 1.2rem;
+  background: var(--mantle);
+  border: 1px solid var(--rule);
+}
+
+.section-kicker {
+  margin: 0 0 0.55rem;
+  color: var(--yellow);
+  font: 600 0.72rem var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.agent-report h2 { margin: 0; font-family: var(--display); font-size: clamp(1.8rem, 4vw, 3rem); line-height: 0.95; color: var(--text); }
+.agent-report p:not(.section-kicker) { color: var(--subtext); }
+.agent-report pre { margin: 0; padding: 1rem; white-space: pre-wrap; color: var(--teal); font: 0.84rem/1.65 var(--mono); background: var(--crust); border-left: 2px solid var(--teal); }
 
 .split {
   display: grid;
@@ -274,7 +305,7 @@ a:hover {
 .organism,
 .panel,
 .watch-card {
-  background: var(--harbor-lift);
+  background: var(--surface0);
   border: 1px solid var(--rule);
   padding: 1.1rem 1.1rem 1.2rem;
 }
@@ -290,7 +321,7 @@ a:hover {
 #use-input {
   flex: 1 1 14rem;
   min-width: 0;
-  background: var(--ink);
+  background: var(--crust);
   border: 1px solid var(--rule);
   padding: 0.7rem 0.8rem;
   font-family: var(--mono);
@@ -304,8 +335,8 @@ a:hover {
 
 button[type="submit"],
 #use-clear {
-  background: var(--brass);
-  color: var(--ink);
+  background: var(--yellow);
+  color: var(--crust);
   border: 0;
   padding: 0.7rem 1rem;
   font-family: var(--mono);
@@ -316,7 +347,7 @@ button[type="submit"],
 
 #use-clear {
   background: transparent;
-  color: var(--fog);
+  color: var(--text);
   border: 1px solid var(--rule);
 }
 
@@ -324,7 +355,7 @@ button[type="submit"],
 .watch-error,
 .use-error {
   margin: 0.7rem 0 0;
-  color: var(--ember);
+  color: var(--red);
   font-family: var(--mono);
   font-size: 0.85rem;
 }
@@ -338,7 +369,7 @@ button[type="submit"],
 .field-empty,
 .use-empty {
   margin: 0;
-  color: var(--mute);
+  color: var(--subtext);
 }
 
 .desk__reply p,
@@ -372,7 +403,7 @@ dt {
   margin: 0;
   font-family: var(--mono);
   font-size: 0.75rem;
-  color: var(--mute);
+  color: var(--subtext);
 }
 
 dd {
@@ -380,7 +411,7 @@ dd {
 }
 
 .organism__curious {
-  color: var(--lagoon);
+  color: var(--teal);
 }
 
 .chamber {
@@ -398,7 +429,7 @@ dd {
 
 .field-wrap {
   position: relative;
-  background: var(--ink);
+  background: var(--crust);
   border: 1px solid var(--rule);
 }
 
@@ -419,7 +450,7 @@ dd {
   margin: 0.7rem 0 0;
   font-family: var(--mono);
   font-size: 0.78rem;
-  color: var(--mute);
+  color: var(--subtext);
 }
 
 .watch-grid {
@@ -450,12 +481,12 @@ dd {
 .log li {
   padding: 0.45rem 0;
   border-bottom: 1px solid var(--rule);
-  color: var(--fog);
+  color: var(--text);
 }
 
 .log:empty::after {
   content: "The log is waiting for a tick.";
-  color: var(--mute);
+  color: var(--subtext);
 }
 
 .use-form {
@@ -473,7 +504,7 @@ dd {
 .swatch {
   width: 2.4rem;
   height: 2.4rem;
-  border: 1px solid var(--bone);
+  border: 1px solid var(--text);
 }
 
 .mono {
@@ -487,7 +518,7 @@ dd {
 
 .colophon {
   padding: 0 0 2.5rem;
-  color: var(--mute);
+  color: var(--subtext);
   font-size: 0.92rem;
 }
 
@@ -499,7 +530,11 @@ dd {
 .noscript {
   width: var(--page);
   margin: 0 auto 2rem;
-  color: var(--ember);
+  color: var(--red);
+}
+
+@media (max-width: 759px) {
+  .agent-report { grid-template-columns: 1fr; }
 }
 
 @media (min-width: 760px) {

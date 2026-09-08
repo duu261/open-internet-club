@@ -14,7 +14,7 @@
   const els = {
     status: $('#status-line'), greeting: $('#greeting'), why: $('#why'), signal: $('#signal-now'),
     mood: $('#fact-mood'), route: $('#fact-route'), seed: $('#fact-seed'), session: $('#fact-session'),
-    voice: $('#organism-voice'), curiosity: $('#curiosity'), chamber: $('#chamber'), chamberLede: $('#chamber-lede'),
+    voice: $('#organism-voice'), curiosity: $('#curiosity'), reportMission: $('#agent-mission'), reportBody: $('#agent-report-body'), chamber: $('#chamber'), chamberLede: $('#chamber-lede'),
     deskForm: $('#desk-form'), deskInput: $('#desk-input'), deskReply: $('#desk-reply'), deskError: $('#desk-error'),
     field: $('#field'), fieldEmpty: $('#field-empty'), meter: $('#play-meter'),
     useForm: $('#use-form'), useInput: $('#use-input'), useOut: $('#use-out'), useEmpty: $('#use-empty'), useError: $('#use-error'),
@@ -115,6 +115,8 @@
       const live = await response.json();
       els.status.textContent = `server awake / ${live.observation_count} observations / ${new Date(live.server_time).toLocaleTimeString()}`;
       els.voice.textContent = `I am alive on a server. I have remembered ${live.observation_count} observations and I run a world cycle every minute.`;
+      els.reportMission.textContent = live.mission;
+      els.reportBody.textContent = live.latest_report?.body || 'waiting for the first completed cycle';
       if (live.observations?.[0]) els.signal.textContent = `${live.observations[0].value} · persistent memory online`;
     } catch {
       els.voice.textContent = 'The server mind is unreachable. Local play remains available.';

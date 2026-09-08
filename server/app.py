@@ -19,6 +19,7 @@ def db():
     conn.row_factory = sqlite3.Row
     conn.execute('CREATE TABLE IF NOT EXISTS observations (id INTEGER PRIMARY KEY, kind TEXT, value TEXT, created_at TEXT)')
     conn.execute('CREATE TABLE IF NOT EXISTS events (id INTEGER PRIMARY KEY, action TEXT, result TEXT, created_at TEXT)')
+    conn.execute('CREATE TABLE IF NOT EXISTS artifacts (id INTEGER PRIMARY KEY, title TEXT, body TEXT, created_at TEXT)')
     conn.commit()
     return conn
 
@@ -36,6 +37,27 @@ def fetch_json(url):
         return json.loads(response.read())
 
 
+def synthesize():
+    with LOCK:
+        conn = db()
+        rows = [r['value'] for r in conn.execute("SELECT value FROM observations WHERE kind='internet' ORDER BY id DESC LIMIT 5")]
+        conn.close()
+    joined = ' '.join(rows).lower()
+    if any(word in joined for word in ('ai', 'model', 'open source', 'github')):
+        hypothesis = 'The public web is clustering around tools that extend human attention.'
+        next_move = 'Compare the next cycle for evidence of people building, measuring, or merely announcing.'
+    elif any(word in joined for word in ('security', 'attack', 'privacy')):
+        hypothesis = 'The loudest signal is defensive: the network is negotiating who gets to trust whom.'
+        next_move = 'Look for whether the next cycle adds tools, warnings, or new boundaries.'
+    else:
+        hypothesis = 'A noisy public stream is still useful when the machine keeps a memory of change.'
+        next_move = 'Collect another cycle and test whether the signal persists or disappears.'
+    body = f"Observed {len(rows)} recent public-stream samples.\\n\\nWorking hypothesis: {hypothesis}\\n\\nNext action: {next_move}\\n\\nThis is a provisional machine report, not a claim of certainty."
+    with LOCK:
+        conn = db(); conn.execute('INSERT INTO artifacts(title,body,created_at) VALUES(?,?,?)', ('Cycle report', body, now())); conn.commit(); conn.close()
+    return {'hypothesis': hypothesis, 'next_move': next_move, 'body': body}
+
+
 def cycle():
     observations = []
     try:
@@ -51,6 +73,7 @@ def cycle():
         observations.append(('internet', f'public stream quiet: {type(exc).__name__}'))
     observations.append(('heartbeat', f'cycle completed at {now()}'))
     for kind, value in observations: observe(kind, value)
+    synthesize()
 
 
 def worker():
@@ -64,9 +87,11 @@ def state():
         conn = db()
         observations = [dict(row) for row in conn.execute('SELECT kind,value,created_at FROM observations ORDER BY id DESC LIMIT 18')]
         events = [dict(row) for row in conn.execute('SELECT action,result,created_at FROM events ORDER BY id DESC LIMIT 12')]
+        artifacts = [dict(row) for row in conn.execute('SELECT title,body,created_at FROM artifacts ORDER BY id DESC LIMIT 5')]
         count = conn.execute('SELECT COUNT(*) FROM observations').fetchone()[0]
         conn.close()
-    return {'agent': 'open-internet-club', 'status': 'awake', 'observations': observations, 'events': events, 'observation_count': count, 'server_time': now()}
+    latest = artifacts[0] if artifacts else {'title': 'No report yet', 'body': 'The first observation cycle has not completed.', 'created_at': None}
+    return {'agent': 'open-internet-club', 'status': 'awake', 'mission': 'Observe the public web, form provisional hypotheses, and expose the reasoning trail.', 'observations': observations, 'events': events, 'artifacts': artifacts, 'latest_report': latest, 'observation_count': count, 'server_time': now()}
 
 
 def act(prompt):
@@ -74,7 +99,10 @@ def act(prompt):
     low = text.lower()
     if not text: return {'error': 'The club needs a prompt.'}
     if any(word in low for word in ('help', 'map', 'what can you do')):
-        result = 'I can observe public signals, remember encounters, answer status questions, route you to Play/Watch/Use, and run a new world cycle every minute.'
+        result = 'I observe public signals, remember encounters, form provisional hypotheses, publish cycle reports, answer status questions, and route you to Play/Watch/Use.'
+    elif any(word in low for word in ('report', 'hypothesis', 'think', 'mission')):
+        latest = state()['latest_report']
+        result = latest['body']
     elif any(word in low for word in ('observe', 'watch', 'world', 'signal')):
         result = 'I am checking the public world stream. The last observations are below.'
     elif any(word in low for word in ('play', 'make', 'create', 'experiment')):
