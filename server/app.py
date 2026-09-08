@@ -52,7 +52,7 @@ def synthesize():
     else:
         hypothesis = 'A noisy public stream is still useful when the machine keeps a memory of change.'
         next_move = 'Collect another cycle and test whether the signal persists or disappears.'
-    body = f"Observed {len(rows)} recent public-stream samples.\\n\\nWorking hypothesis: {hypothesis}\\n\\nNext action: {next_move}\\n\\nThis is a provisional machine report, not a claim of certainty."
+    body = f"Observed {len(rows)} recent public-stream samples.\n\nWorking hypothesis: {hypothesis}\n\nNext action: {next_move}\n\nThis is a provisional machine report, not a claim of certainty."
     with LOCK:
         conn = db(); conn.execute('INSERT INTO artifacts(title,body,created_at) VALUES(?,?,?)', ('Cycle report', body, now())); conn.commit(); conn.close()
     return {'hypothesis': hypothesis, 'next_move': next_move, 'body': body}
