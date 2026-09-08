@@ -1,12 +1,4 @@
-.DS_Store
-Thumbs.db
-*.log
+data/
+__pycache__/
+*.pyc
 .env
-.env.*
-.idea/
-.vscode/
-node_modules/
-dist/
-.cache/
-*.swp
-*~
