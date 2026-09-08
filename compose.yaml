@@ -1,0 +1,29 @@
+services:
+  open-internet-club:
+    build: .
+    restart: unless-stopped
+    environment:
+      PORT: "8080"
+      CLUB_DB: /srv/club/data/club.sqlite3
+    volumes:
+      - club-data:/srv/club/data
+    expose:
+      - "8080"
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - open-internet-club
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+
+volumes:
+  club-data:
+  caddy-data:
+  caddy-config:

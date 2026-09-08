@@ -64,6 +64,10 @@
   function ask(input) {
     const q = input.trim().toLowerCase();
     if (!q) { els.deskError.textContent = 'The desk needs a few words.'; els.deskError.hidden = false; return; }
+    fetch('/api/ask', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt: input }) })
+      .then((response) => response.json())
+      .then((data) => { if (data.result) reply(`<strong>server mind:</strong> ${data.result}`); })
+      .catch(() => {});
     if (/help|map|door/.test(q)) { reply('Three doors: <button class="inline-action" data-open="play">play</button>, <button class="inline-action" data-open="watch">watch</button>, and <button class="inline-action" data-open="use">use</button>.'); return; }
     if (/play|plant|field|game/.test(q)) { openDoor('play'); reply('Opening the signal field. Plant a node and see whether it finds company.'); return; }
     if (/watch|signal|sky|world|iss/.test(q)) { openDoor('watch'); reply('Opening the antenna. It tries public sources, then falls back honestly to the local radio.'); return; }
@@ -104,6 +108,20 @@
     els.swatch.style.background = color; els.color.textContent = `${color} · ${text.length} characters`; els.hash.textContent = hash; els.slug.textContent = text.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'empty'; els.rot13.textContent = text.replace(/[a-z]/gi, (c) => String.fromCharCode(c.charCodeAt(0) + (/[a-m]/i.test(c) ? 13 : -13))); els.reverse.textContent = [...text].reverse().join(''); els.bytes.textContent = new TextEncoder().encode(text).length; els.useEmpty.hidden = true; els.useOut.hidden = false;
   }
 
+  async function syncAgent() {
+    try {
+      const response = await fetch('/api/state', { cache: 'no-store' });
+      if (!response.ok) throw new Error('server unavailable');
+      const live = await response.json();
+      els.status.textContent = `server awake / ${live.observation_count} observations / ${new Date(live.server_time).toLocaleTimeString()}`;
+      els.voice.textContent = `I am alive on a server. I have remembered ${live.observation_count} observations and I run a world cycle every minute.`;
+      if (live.observations?.[0]) els.signal.textContent = `${live.observations[0].value} · persistent memory online`;
+    } catch {
+      els.voice.textContent = 'The server mind is unreachable. Local play remains available.';
+    }
+  }
+  syncAgent();
+  setInterval(syncAgent, 30000);
   doors.forEach((door) => door.addEventListener('click', () => openDoor(door.dataset.door)));
   els.deskForm.addEventListener('submit', (event) => { event.preventDefault(); ask(els.deskInput.value); });
   els.deskReply.addEventListener('click', (event) => { const target = event.target.closest('[data-open]'); if (target) openDoor(target.dataset.open); });
