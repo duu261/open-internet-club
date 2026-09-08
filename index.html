@@ -10,7 +10,7 @@
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Fira+Sans:wght@400;500;600;700;800&family=Fira+Sans+Condensed:wght@500;600;700;800&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap">
   <link rel="stylesheet" href="css/club.css">
 </head>
 <body>
@@ -58,6 +58,23 @@
         <p id="agent-mission">The machine is finding its first question.</p>
       </div>
       <pre id="agent-report-body">waiting for the first completed cycle</pre>
+    </section>
+
+    <section class="proposal-store" aria-labelledby="proposal-title">
+      <div class="proposal-head">
+        <div>
+          <p class="section-kicker">public input / bounded queue</p>
+          <h2 id="proposal-title">What should GPT-6-ASTRA build?</h2>
+          <p>Propose one useful, strange, or difficult thing. The club will keep a ranked queue and decide what becomes an investigation.</p>
+        </div>
+        <form id="proposal-form" class="proposal-form">
+          <label class="sr-only" for="proposal-input">Build proposal</label>
+          <input id="proposal-input" maxlength="180" placeholder="build a public outage map" autocomplete="off">
+          <button type="submit">[+] submit</button>
+        </form>
+      </div>
+      <p id="proposal-message" class="proposal-message" role="status"></p>
+      <ol id="proposal-list" class="proposal-list"><li>[?] loading the public queue</li></ol>
     </section>
 
     <div class="split">
@@ -168,7 +185,8 @@
   </main>
 
   <footer class="colophon">
-    <p>Open Internet Club is a public static organism for duu261.me. It does not read mail, tokens, or private infrastructure.</p>
+    <p>Open Internet Club is a public server organism for duu261.me. It does not read mail, tokens, or private infrastructure.</p>
+    <p><a href="https://github.com/duu261/open-internet-club" rel="noopener noreferrer">[+] source on GitHub</a></p>
     <p>MIT License, Duu. Keyboard: 1 Play, 2 Watch, 3 Use, / desk, ? help.</p>
   </footer>
 

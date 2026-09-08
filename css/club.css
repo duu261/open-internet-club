@@ -1,11 +1,11 @@
 :root {
-  --base: #24273a;
-  --mantle: #1e2030;
-  --crust: #181926;
-  --surface0: #363a4f;
-  --surface1: #494d64;
-  --text: #cad3f5;
-  --subtext: #a5adcb;
+  --base: #fdfbfa;
+  --mantle: #f8f6f4;
+  --crust: #201d1d;
+  --surface0: #f1eeec;
+  --surface1: #e3dfdc;
+  --text: #201d1d;
+  --subtext: #646262;
   --blue: #8aadf4;
   --sapphire: #7dc4e4;
   --teal: #8bd5ca;
@@ -13,13 +13,13 @@
   --yellow: #eed49f;
   --peach: #f5a97f;
   --red: #ed8796;
-  --rule: #494d64;
-  --mute: #8087a2;
-  --bone: #cad3f5;
-  --ink: #181926;
-  --display: "Fira Sans Condensed", "Fira Sans", sans-serif;
-  --serif: "Fira Sans", system-ui, sans-serif;
-  --mono: "Fira Code", ui-monospace, monospace;
+  --rule: rgba(32, 29, 29, .16);
+  --mute: #646262;
+  --bone: #fdfbfa;
+  --ink: #201d1d;
+  --display: "IBM Plex Mono", ui-monospace, monospace;
+  --serif: "IBM Plex Mono", ui-monospace, monospace;
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
   --gap: clamp(1.25rem, 3vw, 2.5rem);
   --page: min(72rem, calc(100% - 2rem));
 }
@@ -43,9 +43,7 @@ body {
   font-optical-sizing: auto;
   font-size: 1.0625rem;
   line-height: 1.55;
-  background:
-    radial-gradient(1200px 480px at 8% -10%, #1e3d4c 0%, transparent 58%),
-    linear-gradient(180deg, #101f28 0%, var(--base) 18%);
+  background: var(--base);
 }
 
 img,
@@ -295,6 +293,24 @@ a:hover {
 .agent-report p:not(.section-kicker) { color: var(--subtext); }
 .agent-report pre { margin: 0; padding: 1rem; white-space: pre-wrap; color: var(--teal); font: 0.84rem/1.65 var(--mono); background: var(--crust); border-left: 2px solid var(--teal); }
 
+.proposal-store {
+  width: var(--page);
+  margin: 2rem auto 0;
+  padding: 1.2rem 0;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+}
+.proposal-head { display: grid; grid-template-columns: 1fr minmax(18rem, 0.8fr); gap: 2rem; align-items: end; }
+.proposal-head h2 { margin: 0; font-family: var(--display); font-size: clamp(1.6rem, 4vw, 2.7rem); line-height: 1; }
+.proposal-head p:not(.section-kicker) { color: var(--subtext); max-width: 42rem; }
+.proposal-form { display: flex; gap: .5rem; }
+.proposal-form input { min-width: 0; flex: 1; background: var(--mantle); border: 1px solid var(--rule); padding: .7rem; color: var(--text); font: .8rem var(--mono); }
+.proposal-form button, .proposal-vote { border: 1px solid var(--ink); background: var(--ink); color: var(--bone); padding: .65rem .75rem; font: .75rem var(--mono); cursor: pointer; }
+.proposal-message { min-height: 1.4em; color: var(--subtext); font: .75rem var(--mono); }
+.proposal-list { list-style: none; margin: 0; padding: 0; }
+.proposal-list li { display: flex; justify-content: space-between; gap: 1rem; align-items: center; padding: .7rem 0; border-bottom: 1px solid var(--rule); font: .8rem/1.5 var(--mono); }
+.proposal-vote { flex: 0 0 auto; background: var(--base); color: var(--ink); }
+
 .split {
   display: grid;
   gap: 1.5rem;
@@ -535,6 +551,8 @@ dd {
 
 @media (max-width: 759px) {
   .agent-report { grid-template-columns: 1fr; }
+  .proposal-head { grid-template-columns: 1fr; gap: 1rem; }
+  .proposal-form { flex-direction: column; }
 }
 
 @media (min-width: 760px) {

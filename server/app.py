@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import html, json, os, sqlite3, threading, time, urllib.request
+import hashlib, html, json, os, re, sqlite3, threading, time, urllib.request
 from datetime import datetime, timezone
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -21,6 +21,7 @@ def db():
     conn.execute('CREATE TABLE IF NOT EXISTS events (id INTEGER PRIMARY KEY, action TEXT, result TEXT, created_at TEXT)')
     conn.execute('CREATE TABLE IF NOT EXISTS artifacts (id INTEGER PRIMARY KEY, title TEXT, body TEXT, created_at TEXT)')
     conn.execute('CREATE TABLE IF NOT EXISTS investigations (id INTEGER PRIMARY KEY, topic TEXT, question TEXT, status TEXT, finding TEXT, created_at TEXT)')
+    conn.execute('CREATE TABLE IF NOT EXISTS proposals (id INTEGER PRIMARY KEY, text TEXT NOT NULL, normalized TEXT NOT NULL UNIQUE, votes INTEGER NOT NULL DEFAULT 1, status TEXT NOT NULL DEFAULT "open", created_at TEXT)')
     conn.commit()
     return conn
 
@@ -112,6 +113,55 @@ def worker():
         time.sleep(60)
 
 
+RATE = {}
+RATE_LOCK = threading.Lock()
+
+
+def client_key(handler):
+    forwarded = handler.headers.get('X-Forwarded-For', '')
+    return (forwarded.split(',')[0].strip() or handler.client_address[0])[:80]
+
+
+def allowed(key, action, window=300, limit=6):
+    stamp = time.time()
+    with RATE_LOCK:
+        bucket = [t for t in RATE.get((key, action), []) if stamp - t < window]
+        if len(bucket) >= limit:
+            RATE[(key, action)] = bucket
+            return False
+        bucket.append(stamp); RATE[(key, action)] = bucket
+        return True
+
+
+def proposals():
+    with LOCK:
+        conn = db(); rows = [dict(r) for r in conn.execute('SELECT id,text,votes,status,created_at FROM proposals WHERE status != "pruned" ORDER BY votes DESC,id DESC LIMIT 30')]; conn.close()
+    return rows
+
+
+def add_proposal(text, key):
+    text = re.sub(r'\\s+', ' ', (text or '').strip())
+    if not 8 <= len(text) <= 180: return {'error': 'Proposal must be 8-180 characters.'}
+    if re.search(r'https?://|www\\.|<[^>]+>|[A-Za-z0-9+/]{36,}', text, re.I): return {'error': 'Links, markup, and token-like strings are not accepted.'}
+    if not allowed(key, 'proposal', 3600, 3): return {'error': 'Proposal rate limit reached. Let the machine digest the queue first.'}
+    normalized = re.sub(r'[^a-z0-9 ]', '', text.lower()).strip()
+    digest = hashlib.sha256(normalized.encode()).hexdigest()[:16]
+    with LOCK:
+        conn = db()
+        existing = conn.execute('SELECT id FROM proposals WHERE normalized=?', (digest,)).fetchone()
+        if existing: conn.close(); return {'error': 'A similar proposal is already in the store.', 'duplicate': existing['id']}
+        conn.execute('INSERT INTO proposals(text,normalized,created_at) VALUES(?,?,?)', (text, digest, now())); conn.commit(); conn.close()
+    return {'ok': True, 'proposals': proposals()}
+
+
+def vote_proposal(proposal_id, key):
+    if not allowed(key, f'vote:{proposal_id}', 3600, 1): return {'error': 'You already voted on this proposal recently.'}
+    with LOCK:
+        conn = db(); cur = conn.execute('UPDATE proposals SET votes=votes+1 WHERE id=? AND status != "pruned"', (int(proposal_id),)); conn.commit(); conn.close()
+    if cur.rowcount == 0: return {'error': 'Proposal not found.'}
+    return {'ok': True, 'proposals': proposals()}
+
+
 def state():
     with LOCK:
         conn = db()
@@ -156,12 +206,17 @@ class Handler(SimpleHTTPRequestHandler):
         self.send_response(code); self.send_header('Content-Type', 'application/json; charset=utf-8'); self.send_header('Content-Length', str(len(body))); self.send_header('Cache-Control', 'no-store'); self.end_headers(); self.wfile.write(body)
     def do_GET(self):
         if self.path == '/api/state': self.send_json(state()); return
+        if self.path == '/api/proposals': self.send_json({'proposals': proposals()}); return
         if self.path == '/api/health': self.send_json({'ok': True, 'service': 'open-internet-club', 'time': now()}); return
         super().do_GET()
     def do_POST(self):
-        if self.path != '/api/ask': self.send_json({'error': 'not found'}, 404); return
         try:
-            length = int(self.headers.get('Content-Length', '0')); payload = json.loads(self.rfile.read(length) or b'{}'); self.send_json(act(payload.get('prompt', '')))
+            length = int(self.headers.get('Content-Length', '0')); payload = json.loads(self.rfile.read(length) or b'{}')
+            key = client_key(self)
+            if self.path == '/api/ask': self.send_json(act(payload.get('prompt', ''))); return
+            if self.path == '/api/proposals': self.send_json(add_proposal(payload.get('text', ''), key)); return
+            if self.path == '/api/proposals/vote': self.send_json(vote_proposal(payload.get('id', 0), key)); return
+            self.send_json({'error': 'not found'}, 404)
         except Exception as exc: self.send_json({'error': str(exc)}, 400)
     def log_message(self, format, *args): print(f'{self.address_string()} {format % args}')
 

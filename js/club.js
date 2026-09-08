@@ -14,7 +14,7 @@
   const els = {
     status: $('#status-line'), greeting: $('#greeting'), why: $('#why'), signal: $('#signal-now'),
     mood: $('#fact-mood'), route: $('#fact-route'), seed: $('#fact-seed'), session: $('#fact-session'),
-    voice: $('#organism-voice'), curiosity: $('#curiosity'), reportMission: $('#agent-mission'), reportBody: $('#agent-report-body'), chamber: $('#chamber'), chamberLede: $('#chamber-lede'),
+    voice: $('#organism-voice'), curiosity: $('#curiosity'), reportMission: $('#agent-mission'), reportBody: $('#agent-report-body'), proposalForm: $('#proposal-form'), proposalInput: $('#proposal-input'), proposalMessage: $('#proposal-message'), proposalList: $('#proposal-list'), chamber: $('#chamber'), chamberLede: $('#chamber-lede'),
     deskForm: $('#desk-form'), deskInput: $('#desk-input'), deskReply: $('#desk-reply'), deskError: $('#desk-error'),
     field: $('#field'), fieldEmpty: $('#field-empty'), meter: $('#play-meter'),
     useForm: $('#use-form'), useInput: $('#use-input'), useOut: $('#use-out'), useEmpty: $('#use-empty'), useError: $('#use-error'),
@@ -107,6 +107,30 @@
     els.useError.hidden = true; const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text)); const hash = [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join(''); const color = `#${hash.slice(0, 6)}`;
     els.swatch.style.background = color; els.color.textContent = `${color} · ${text.length} characters`; els.hash.textContent = hash; els.slug.textContent = text.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'empty'; els.rot13.textContent = text.replace(/[a-z]/gi, (c) => String.fromCharCode(c.charCodeAt(0) + (/[a-m]/i.test(c) ? 13 : -13))); els.reverse.textContent = [...text].reverse().join(''); els.bytes.textContent = new TextEncoder().encode(text).length; els.useEmpty.hidden = true; els.useOut.hidden = false;
   }
+
+  async function refreshProposals() {
+    try {
+      const response = await fetch('/api/proposals', { cache: 'no-store' });
+      const data = await response.json();
+      els.proposalList.replaceChildren();
+      if (!data.proposals?.length) { const li = document.createElement('li'); li.textContent = '[?] no proposals yet'; els.proposalList.append(li); return; }
+      data.proposals.forEach((proposal, index) => {
+        const li = document.createElement('li');
+        const label = document.createElement('span'); label.textContent = `[${index + 1}] ${proposal.text}  ${proposal.votes} votes  ${proposal.status}`;
+        const vote = document.createElement('button'); vote.type = 'button'; vote.className = 'proposal-vote'; vote.textContent = '[+] vote'; vote.addEventListener('click', async () => { const result = await fetch('/api/proposals/vote', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: proposal.id }) }).then((r) => r.json()); els.proposalMessage.textContent = result.error || 'vote recorded'; refreshProposals(); });
+        li.append(label, vote); els.proposalList.append(li);
+      });
+    } catch { els.proposalMessage.textContent = '[x] proposal store unavailable'; }
+  }
+  els.proposalForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const text = els.proposalInput.value.trim();
+    const result = await fetch('/api/proposals', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text }) }).then((r) => r.json());
+    els.proposalMessage.textContent = result.error || '[+] proposal stored';
+    if (!result.error) { els.proposalInput.value = ''; refreshProposals(); }
+  });
+  refreshProposals();
+  setInterval(refreshProposals, 30000);
 
   async function syncAgent() {
     try {
