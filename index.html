@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#142833">
+  <title>Open Internet Club — duu261.me</title>
+  <meta name="description" content="Open Internet Club is the public interface of duu261.me: a living room with three doors, a desk that answers, and tools that stay in the browser.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Spline+Sans+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="css/club.css">
+</head>
+<body>
+  <a class="skip" href="#desk">Skip to the desk</a>
+
+  <header class="status" role="banner">
+    <p class="status__pulse" aria-hidden="true"></p>
+    <p class="status__line" id="status-line">club waking</p>
+    <p class="status__hint">keys 1 2 3 doors, slash for desk</p>
+  </header>
+
+  <main id="lobby">
+    <section class="hero" aria-labelledby="club-name">
+      <p class="hero__place">duu261.me</p>
+      <h1 id="club-name">Open Internet Club</h1>
+      <p class="hero__greet" id="greeting" aria-live="polite">The room is assembling itself.</p>
+      <p class="hero__why" id="why">I will choose a door once the clock settles.</p>
+    </section>
+
+    <nav class="doors" aria-label="Club doors">
+      <button class="door" type="button" data-door="play" id="door-play" aria-pressed="false">
+        <span class="door__name">Play</span>
+        <span class="door__blurb">Plant a field. Watch it connect.</span>
+      </button>
+      <button class="door" type="button" data-door="watch" id="door-watch" aria-pressed="false">
+        <span class="door__name">Watch</span>
+        <span class="door__blurb">Public sky, local log, no private rooms.</span>
+      </button>
+      <button class="door" type="button" data-door="use" id="door-use" aria-pressed="false">
+        <span class="door__name">Use</span>
+        <span class="door__blurb">Hash, color, and reshape a phrase.</span>
+      </button>
+    </nav>
+
+    <section class="signals" aria-labelledby="signals-title">
+      <h2 id="signals-title" class="signals__title">Live signals</h2>
+      <p class="signals__note">Generated here from the clock, the seed, and this browser. Nothing is pulled from private machines.</p>
+      <p class="signals__now" id="signal-now" aria-live="polite">waiting for first tick</p>
+    </section>
+
+    <div class="split">
+      <section class="desk" id="desk" aria-labelledby="desk-title">
+        <h2 id="desk-title">Desk</h2>
+        <p class="desk__lede">Ask the club to open a door, reveal an object, pick a route, or start an experiment.</p>
+        <form id="desk-form" class="desk__form" action="#" method="get">
+          <label class="sr-only" for="desk-input">Ask the club</label>
+          <input
+            id="desk-input"
+            name="ask"
+            type="text"
+            autocomplete="off"
+            spellcheck="false"
+            placeholder="ask for a door, an object, a route, a hash"
+            maxlength="240">
+          <button type="submit">Ask</button>
+        </form>
+        <p class="desk__error" id="desk-error" hidden role="alert"></p>
+        <div class="desk__reply" id="desk-reply" aria-live="polite">
+          <p class="empty">The desk is quiet. Type <kbd>help</kbd> if you want a map.</p>
+        </div>
+      </section>
+
+      <aside class="organism" aria-labelledby="organism-title">
+        <h2 id="organism-title">Club state</h2>
+        <dl class="organism__facts" id="organism-facts">
+          <div><dt>mood</dt><dd id="fact-mood">waking</dd></div>
+          <div><dt>route</dt><dd id="fact-route">undecided</dd></div>
+          <div><dt>seed</dt><dd id="fact-seed">—</dd></div>
+          <div><dt>session</dt><dd id="fact-session">0s</dd></div>
+        </dl>
+        <p class="organism__voice" id="organism-voice">I am a static page that keeps time and chooses. I do not see your accounts.</p>
+        <p class="organism__curious" id="curiosity">Curiosity still loading.</p>
+      </aside>
+    </div>
+
+    <section class="chamber" id="chamber" aria-labelledby="chamber-title">
+      <h2 id="chamber-title">Chamber</h2>
+      <p class="chamber__lede" id="chamber-lede">Walk a door, or let me choose.</p>
+
+      <article class="panel" id="panel-play" hidden data-panel="play">
+        <header class="panel__head">
+          <h3>Signal field</h3>
+          <p>Click or press Space to plant. Arrows move the listener. C clears.</p>
+        </header>
+        <div class="field-wrap">
+          <canvas id="field" width="960" height="420" aria-label="Playable signal field"></canvas>
+          <p class="field-empty" id="field-empty">The field is empty. Plant the first signal.</p>
+        </div>
+        <p class="panel__meter" id="play-meter">nodes 0 / links 0 / density quiet</p>
+      </article>
+
+      <article class="panel" id="panel-watch" hidden data-panel="watch">
+        <header class="panel__head">
+          <h3>Antenna</h3>
+          <p>Public feeds if the browser can reach them. Local log either way.</p>
+        </header>
+        <div class="watch-grid">
+          <section class="watch-card" aria-labelledby="iss-title">
+            <h4 id="iss-title">ISS</h4>
+            <p id="iss-body" class="watch-body">asking the public tracker</p>
+          </section>
+          <section class="watch-card" aria-labelledby="equator-title">
+            <h4 id="equator-title">Equator antenna</h4>
+            <p id="equator-body" class="watch-body">asking open-meteo at 0, 0</p>
+          </section>
+          <section class="watch-card" aria-labelledby="today-title">
+            <h4 id="today-title">This day</h4>
+            <p id="today-body" class="watch-body">asking wikipedia on this day</p>
+          </section>
+        </div>
+        <p class="watch-error" id="watch-error" hidden role="status"></p>
+        <h4 class="log-title">Local radio log</h4>
+        <ol class="log" id="radio-log" aria-live="polite"></ol>
+      </article>
+
+      <article class="panel" id="panel-use" hidden data-panel="use">
+        <header class="panel__head">
+          <h3>Phrase bench</h3>
+          <p>Stays in this tab. SHA-256, a color, and a few transforms.</p>
+        </header>
+        <form id="use-form" class="use-form" action="#" method="get">
+          <label class="sr-only" for="use-input">Phrase to transform</label>
+          <textarea id="use-input" name="phrase" rows="3" maxlength="4000" placeholder="paste a phrase, a color, a name"></textarea>
+          <div class="use-actions">
+            <button type="submit">Transform</button>
+            <button type="button" id="use-clear">Clear</button>
+          </div>
+        </form>
+        <p class="use-empty" id="use-empty">Give the club a phrase. It will return a color, a hash, and reshapes.</p>
+        <p class="use-error" id="use-error" hidden role="alert"></p>
+        <div class="use-out" id="use-out" hidden>
+          <div class="swatch-row">
+            <div class="swatch" id="use-swatch" aria-hidden="true"></div>
+            <p id="use-color"></p>
+          </div>
+          <dl class="use-facts">
+            <div><dt>sha-256</dt><dd id="use-hash" class="mono wrap"></dd></div>
+            <div><dt>slug</dt><dd id="use-slug" class="mono wrap"></dd></div>
+            <div><dt>rot13</dt><dd id="use-rot13" class="wrap"></dd></div>
+            <div><dt>reverse</dt><dd id="use-reverse" class="wrap"></dd></div>
+            <div><dt>bytes</dt><dd id="use-bytes" class="mono"></dd></div>
+          </dl>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <footer class="colophon">
+    <p>Open Internet Club is a public static organism for duu261.me. It does not read mail, tokens, or private infrastructure.</p>
+    <p>MIT License, Duu. Keyboard: 1 Play, 2 Watch, 3 Use, / desk, ? help.</p>
+  </footer>
+
+  <noscript>
+    <p class="noscript">This club needs JavaScript in the browser to keep time, plant the field, and hash phrases. The HTML still names the three doors: Play, Watch, and Use.</p>
+  </noscript>
+
+  <script src="js/club.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Open Internet Club">
+  <rect width="64" height="64" fill="#142833"/>
+  <rect x="8" y="12" width="12" height="40" fill="none" stroke="#C7923E" stroke-width="2"/>
+  <rect x="26" y="12" width="12" height="40" fill="none" stroke="#3AA6B4" stroke-width="2"/>
+  <rect x="44" y="12" width="12" height="40" fill="none" stroke="#D4654A" stroke-width="2"/>
+  <rect x="11" y="28" width="6" height="2" fill="#C7923E"/>
+  <rect x="29" y="28" width="6" height="2" fill="#3AA6B4"/>
+  <rect x="47" y="28" width="6" height="2" fill="#D4654A"/>
+</svg>
