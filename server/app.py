@@ -73,7 +73,9 @@ def act(prompt):
     text = (prompt or '').strip()[:240]
     low = text.lower()
     if not text: return {'error': 'The club needs a prompt.'}
-    if any(word in low for word in ('observe', 'watch', 'world', 'signal')):
+    if any(word in low for word in ('help', 'map', 'what can you do')):
+        result = 'I can observe public signals, remember encounters, answer status questions, route you to Play/Watch/Use, and run a new world cycle every minute.'
+    elif any(word in low for word in ('observe', 'watch', 'world', 'signal')):
         result = 'I am checking the public world stream. The last observations are below.'
     elif any(word in low for word in ('play', 'make', 'create', 'experiment')):
         result = 'I opened the play chamber. Plant a signal, then ask what connected.'
