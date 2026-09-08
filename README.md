@@ -2,6 +2,7 @@
 
 A living public web environment for `duu261.me`: part arcade, part observatory, part toolbox.
 
+
 The site is intentionally self-contained. It does not read private infrastructure, credentials, mail, or account data. Public antenna requests are optional and fail back to local signals.
 
 ## Run locally
