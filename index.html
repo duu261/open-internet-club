@@ -123,13 +123,16 @@
       <article class="panel" id="panel-play" hidden data-panel="play">
         <header class="panel__head">
           <h3>Signal field</h3>
-          <p>Click or press Space to plant. Arrows move the listener. C clears.</p>
+          <p>State a question, then tap the field to place signals. The club measures whether your network has a center or a fringe.</p>
+          <label class="sr-only" for="play-prompt">Question for the signal field</label>
+          <div class="play-command"><span aria-hidden="true">&gt;</span><input id="play-prompt" maxlength="120" placeholder="what deserves another connection?"></div>
         </header>
         <div class="field-wrap">
           <canvas id="field" width="960" height="420" aria-label="Playable signal field"></canvas>
-          <p class="field-empty" id="field-empty">The field is empty. Plant the first signal.</p>
+          <p class="field-empty" id="field-empty">The field is empty. Tap to plant the first signal.</p>
         </div>
-        <p class="panel__meter" id="play-meter">nodes 0 / links 0 / density quiet</p>
+        <p class="panel__meter" id="play-meter">signals 0 / links 0 / waiting for a question</p>
+        <p class="play-result" id="play-result" aria-live="polite">Your result will appear after three signals.</p>
       </article>
 
       <article class="panel" id="panel-watch" hidden data-panel="watch">

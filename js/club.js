@@ -16,7 +16,7 @@
     mood: $('#fact-mood'), route: $('#fact-route'), seed: $('#fact-seed'), session: $('#fact-session'),
     voice: $('#organism-voice'), curiosity: $('#curiosity'), reportMission: $('#agent-mission'), reportBody: $('#agent-report-body'), sources: $('#agent-sources'), proposalForm: $('#proposal-form'), proposalInput: $('#proposal-input'), proposalMessage: $('#proposal-message'), proposalList: $('#proposal-list'), chamber: $('#chamber'), chamberLede: $('#chamber-lede'),
     deskForm: $('#desk-form'), deskInput: $('#desk-input'), deskReply: $('#desk-reply'), deskError: $('#desk-error'),
-    field: $('#field'), fieldEmpty: $('#field-empty'), meter: $('#play-meter'),
+    field: $('#field'), fieldEmpty: $('#field-empty'), meter: $('#play-meter'), playPrompt: $('#play-prompt'), playResult: $('#play-result'),
     useForm: $('#use-form'), useInput: $('#use-input'), useOut: $('#use-out'), useEmpty: $('#use-empty'), useError: $('#use-error'),
     swatch: $('#use-swatch'), color: $('#use-color'), hash: $('#use-hash'), slug: $('#use-slug'), rot13: $('#use-rot13'), reverse: $('#use-reverse'), bytes: $('#use-bytes'),
     iss: $('#iss-body'), equator: $('#equator-body'), today: $('#today-body'), watchError: $('#watch-error'), log: $('#radio-log')
@@ -107,20 +107,48 @@
   }
 
   function drawField() {
-    const canvas = els.field; const ctx = canvas.getContext('2d');
-    const rect = canvas.getBoundingClientRect(); const scale = canvas.width / rect.width; const point = (event) => ({ x: (event.clientX - rect.left) * scale, y: (event.clientY - rect.top) * scale });
+    const canvas = els.field;
+    const ctx = canvas.getContext('2d');
+    const point = (event) => {
+      const rect = canvas.getBoundingClientRect();
+      return { x: (event.clientX - rect.left) * canvas.width / rect.width, y: (event.clientY - rect.top) * canvas.height / rect.height };
+    };
     const render = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.fillStyle = '#10212a'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.strokeStyle = 'rgba(102, 194, 190, .12)'; ctx.lineWidth = 1;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#171717'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.strokeStyle = 'rgba(245,243,237,.12)'; ctx.lineWidth = 1;
       for (let x = 0; x < canvas.width; x += 48) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke(); }
       for (let y = 0; y < canvas.height; y += 48) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke(); }
-      state.nodes.forEach((node, index) => { state.nodes.slice(index + 1).forEach((other) => { const d = Math.hypot(node.x - other.x, node.y - other.y); if (d < 220) { ctx.strokeStyle = `rgba(199,146,62,${1 - d / 260})`; ctx.beginPath(); ctx.moveTo(node.x, node.y); ctx.lineTo(other.x, other.y); ctx.stroke(); } }); });
-      state.nodes.forEach((node, index) => { ctx.fillStyle = index % 2 ? '#66c2be' : '#c7923e'; ctx.beginPath(); ctx.arc(node.x, node.y, 6 + (index % 3), 0, Math.PI * 2); ctx.fill(); });
-      ctx.strokeStyle = '#f3eee4'; ctx.beginPath(); ctx.arc(state.listener.x, state.listener.y, 12, 0, Math.PI * 2); ctx.stroke();
-      const links = state.nodes.reduce((sum, n, i) => sum + state.nodes.slice(i + 1).filter((m) => Math.hypot(n.x - m.x, n.y - m.y) < 220).length, 0);
-      els.meter.textContent = `nodes ${state.nodes.length} / links ${links} / density ${state.nodes.length > 7 ? 'alive' : state.nodes.length > 2 ? 'forming' : 'quiet'}`; els.fieldEmpty.hidden = state.nodes.length > 0;
+      let links = 0;
+      state.nodes.forEach((node, index) => state.nodes.slice(index + 1).forEach((other) => {
+        const d = Math.hypot(node.x - other.x, node.y - other.y);
+        if (d < 220) { links += 1; ctx.strokeStyle = `rgba(36,87,214,${1 - d / 260})`; ctx.beginPath(); ctx.moveTo(node.x, node.y); ctx.lineTo(other.x, other.y); ctx.stroke(); }
+      }));
+      state.nodes.forEach((node, index) => { ctx.fillStyle = index === 0 ? '#f5f3ed' : '#2457d6'; ctx.beginPath(); ctx.arc(node.x, node.y, 7, 0, Math.PI * 2); ctx.fill(); });
+      ctx.strokeStyle = '#f5f3ed'; ctx.beginPath(); ctx.arc(state.listener.x, state.listener.y, 12, 0, Math.PI * 2); ctx.stroke();
+      els.meter.textContent = `signals ${state.nodes.length} / links ${links} / ${state.nodes.length < 3 ? 'add more signals' : links > state.nodes.length ? 'dense network' : 'scattered network'}`;
+      els.fieldEmpty.hidden = state.nodes.length > 0;
+      if (state.nodes.length >= 3) {
+        const density = links / (state.nodes.length * (state.nodes.length - 1) / 2);
+        const verdict = density >= .45 ? 'This question has a center: your signals reinforce one another.' : 'This question has a fringe: your signals are not finding enough common ground.';
+        els.playResult.textContent = `${verdict} Density ${(density * 100).toFixed(0)}%. Add another signal to challenge the finding.`;
+      } else els.playResult.textContent = 'Your result will appear after three signals.';
     };
-    if (!canvas.dataset.bound) { canvas.dataset.bound = 'true'; canvas.addEventListener('click', (event) => { state.nodes.push(point(event)); render(); }); document.addEventListener('keydown', (event) => { if (state.route !== 'play') return; const step = 18; if (event.key === 'ArrowLeft') state.listener.x -= step; if (event.key === 'ArrowRight') state.listener.x += step; if (event.key === 'ArrowUp') state.listener.y -= step; if (event.key === 'ArrowDown') state.listener.y += step; if (event.key.toLowerCase() === 'c') state.nodes = []; state.listener.x = Math.max(15, Math.min(canvas.width - 15, state.listener.x)); state.listener.y = Math.max(15, Math.min(canvas.height - 15, state.listener.y)); render(); }); }
+    if (!canvas.dataset.bound) {
+      canvas.dataset.bound = 'true';
+      canvas.addEventListener('pointerdown', (event) => { event.preventDefault(); if (!els.playPrompt.value.trim()) { els.playResult.textContent = 'Start with a question above, then place signals.'; els.playPrompt.focus(); return; } state.nodes.push(point(event)); render(); });
+      document.addEventListener('keydown', (event) => {
+        if (state.route !== 'play' || event.target.matches('input, textarea')) return;
+        const step = 18;
+        if (event.key === ' ') { event.preventDefault(); state.nodes.push({ ...state.listener }); render(); }
+        if (event.key === 'ArrowLeft') state.listener.x -= step;
+        if (event.key === 'ArrowRight') state.listener.x += step;
+        if (event.key === 'ArrowUp') state.listener.y -= step;
+        if (event.key === 'ArrowDown') state.listener.y += step;
+        if (event.key.toLowerCase() === 'c') state.nodes = [];
+        state.listener.x = Math.max(15, Math.min(canvas.width - 15, state.listener.x)); state.listener.y = Math.max(15, Math.min(canvas.height - 15, state.listener.y)); render();
+      });
+    }
     render();
   }
 

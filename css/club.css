@@ -682,11 +682,18 @@ body { font-size: 0.95rem; line-height: 1.55; }
 .chamber { padding-top: 4rem; }
 .panel { border: 1px solid var(--text); padding: 1rem; }
 .field-wrap { border-color: var(--text); }
+#field { touch-action: none; }
+.play-command { display: flex; align-items: center; gap: .65rem; margin-top: 1rem; border-bottom: 1px solid var(--text); }
+.play-command span { color: var(--blue); font-weight: 600; }
+.play-command input { width: 100%; min-width: 0; border: 0; outline: 0; padding: .65rem 0; background: transparent; color: var(--text); font: .85rem var(--mono); }
+.play-result { min-height: 2.8em; margin: .8rem 0 0; color: var(--text); font-family: var(--mono); font-size: .82rem; }
 .watch-card { border-top-color: var(--rule); }
 .colophon { margin-top: 4rem; padding-top: 1rem; border-top: 1px solid var(--text); font-size: .8rem; }
 @media (max-width: 759px) {
   .hero { grid-template-columns: 1fr; }
   .hero__mark, .hero__tagline, .hero__greet, .hero__why { grid-column: 1; }
   .hero__mark { grid-row: auto; margin-bottom: 1.5rem; }
+  .agent-report, .proposal-head, .split { grid-template-columns: 1fr; }
+  .proposal-form { flex-direction: column; }
   .split { gap: 2.5rem; }
 }
