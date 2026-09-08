@@ -142,7 +142,7 @@ def allowed(key, action, window=300, limit=6):
 
 def proposals():
     with LOCK:
-        conn = db(); rows = [dict(r) for r in conn.execute('SELECT id,text,votes,status,created_at FROM proposals WHERE status != "pruned" ORDER BY votes DESC,id DESC LIMIT 30')]; conn.close()
+        conn = db(); rows = [dict(r) for r in conn.execute('SELECT id,text,votes,status,created_at FROM proposals WHERE status != "pruned" ORDER BY id DESC LIMIT 30')]; conn.close()
     return rows
 
 
@@ -162,7 +162,6 @@ def add_proposal(text, key):
 
 
 def vote_proposal(proposal_id, key):
-    if not allowed(key, f'vote:{proposal_id}', 3600, 1): return {'error': 'You already voted on this proposal recently.'}
     with LOCK:
         conn = db(); cur = conn.execute('UPDATE proposals SET votes=votes+1 WHERE id=? AND status != "pruned"', (int(proposal_id),)); conn.commit(); conn.close()
     if cur.rowcount == 0: return {'error': 'Proposal not found.'}

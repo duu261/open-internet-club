@@ -114,10 +114,10 @@
       const data = await response.json();
       els.proposalList.replaceChildren();
       if (!data.proposals?.length) { const li = document.createElement('li'); li.textContent = '[?] no proposals yet'; els.proposalList.append(li); return; }
-      data.proposals.forEach((proposal, index) => {
+      data.proposals.forEach((proposal) => {
         const li = document.createElement('li');
-        const label = document.createElement('span'); label.textContent = `[${index + 1}] ${proposal.text}  ${proposal.votes} votes  ${proposal.status}`;
-        const vote = document.createElement('button'); vote.type = 'button'; vote.className = 'proposal-vote'; vote.textContent = '[+] vote'; vote.addEventListener('click', async () => { const result = await fetch('/api/proposals/vote', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: proposal.id }) }).then((r) => r.json()); els.proposalMessage.textContent = result.error || 'vote recorded'; refreshProposals(); });
+        const label = document.createElement('span'); label.textContent = `[+] ${proposal.text}`;
+        const vote = document.createElement('button'); vote.type = 'button'; vote.className = 'proposal-vote'; vote.textContent = '[↑] vote'; vote.setAttribute('aria-label', `Vote for ${proposal.text}`); vote.addEventListener('click', async () => { const result = await fetch('/api/proposals/vote', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: proposal.id }) }).then((r) => r.json()); els.proposalMessage.textContent = result.error || '[+] vote recorded'; refreshProposals(); });
         li.append(label, vote); els.proposalList.append(li);
       });
     } catch { els.proposalMessage.textContent = '[x] proposal store unavailable'; }
@@ -141,7 +141,9 @@
       els.voice.textContent = `I am alive on a server. I have remembered ${live.observation_count} observations and I run a world cycle every minute.`;
       els.reportMission.textContent = live.mission;
       els.reportBody.textContent = live.latest_report?.body || 'waiting for the first completed cycle';
-      els.sources.textContent = (live.observations || []).filter((item) => ['internet', 'github', 'iss', 'world'].includes(item.kind)).slice(0, 6).map((item) => `[${item.kind}] ${item.value}`).join('\n') || '[?] no source readings yet';
+      const latestSources = new Map();
+      (live.observations || []).filter((item) => ['internet', 'github', 'iss', 'world'].includes(item.kind)).forEach((item) => { if (!latestSources.has(item.kind)) latestSources.set(item.kind, item); });
+      els.sources.textContent = [...latestSources.values()].map((item) => `[${item.kind}] ${item.value}`).join('\n') || '[?] no source readings yet';
       if (live.observations?.[0]) els.signal.textContent = `${live.observations[0].value} · persistent memory online`;
     } catch {
       els.voice.textContent = 'The server mind is unreachable. Local play remains available.';
