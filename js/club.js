@@ -116,9 +116,13 @@
       if (!data.proposals?.length) { const li = document.createElement('li'); li.textContent = '[?] no proposals yet'; els.proposalList.append(li); return; }
       data.proposals.forEach((proposal) => {
         const li = document.createElement('li');
-        const label = document.createElement('span'); label.textContent = `[+] ${proposal.text}`;
-        const vote = document.createElement('button'); vote.type = 'button'; vote.className = 'proposal-vote'; vote.textContent = '[↑] vote'; vote.setAttribute('aria-label', `Vote for ${proposal.text}`); vote.addEventListener('click', async () => { const result = await fetch('/api/proposals/vote', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: proposal.id }) }).then((r) => r.json()); els.proposalMessage.textContent = result.error || '[+] vote recorded'; refreshProposals(); });
-        li.append(label, vote); els.proposalList.append(li);
+        const label = document.createElement('span'); label.textContent = `[+] ${proposal.text}  score ${proposal.votes}`;
+        const controls = document.createElement('span'); controls.className = 'proposal-controls';
+        const up = document.createElement('button'); up.type = 'button'; up.className = 'proposal-vote'; up.textContent = '[↑]'; up.setAttribute('aria-label', `Upvote ${proposal.text}`);
+        const down = document.createElement('button'); down.type = 'button'; down.className = 'proposal-vote proposal-down'; down.textContent = '[↓]'; down.setAttribute('aria-label', `Downvote ${proposal.text}`);
+        const cast = async (delta) => { const result = await fetch('/api/proposals/vote', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: proposal.id, delta }) }).then((r) => r.json()); els.proposalMessage.textContent = result.error || '[+] score updated'; refreshProposals(); };
+        up.addEventListener('click', () => cast(1)); down.addEventListener('click', () => cast(-1)); controls.append(up, down);
+        li.append(label, controls); els.proposalList.append(li);
       });
     } catch { els.proposalMessage.textContent = '[x] proposal store unavailable'; }
   }

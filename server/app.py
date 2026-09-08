@@ -161,9 +161,10 @@ def add_proposal(text, key):
     return {'ok': True, 'proposals': proposals()}
 
 
-def vote_proposal(proposal_id, key):
+def vote_proposal(proposal_id, key, delta):
+    delta = 1 if int(delta) > 0 else -1
     with LOCK:
-        conn = db(); cur = conn.execute('UPDATE proposals SET votes=votes+1 WHERE id=? AND status != "pruned"', (int(proposal_id),)); conn.commit(); conn.close()
+        conn = db(); cur = conn.execute('UPDATE proposals SET votes=votes+? WHERE id=? AND status != "pruned"', (delta, int(proposal_id))); conn.commit(); conn.close()
     if cur.rowcount == 0: return {'error': 'Proposal not found.'}
     return {'ok': True, 'proposals': proposals()}
 
@@ -221,7 +222,7 @@ class Handler(SimpleHTTPRequestHandler):
             key = client_key(self)
             if self.path == '/api/ask': self.send_json(act(payload.get('prompt', ''))); return
             if self.path == '/api/proposals': self.send_json(add_proposal(payload.get('text', ''), key)); return
-            if self.path == '/api/proposals/vote': self.send_json(vote_proposal(payload.get('id', 0), key)); return
+            if self.path == '/api/proposals/vote': self.send_json(vote_proposal(payload.get('id', 0), key, payload.get('delta', 1))); return
             self.send_json({'error': 'not found'}, 404)
         except Exception as exc: self.send_json({'error': str(exc)}, 400)
     def log_message(self, format, *args): print(f'{self.address_string()} {format % args}')

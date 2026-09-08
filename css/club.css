@@ -315,7 +315,9 @@ a:hover {
 .proposal-message { min-height: 1.4em; color: var(--subtext); font: .75rem var(--mono); }
 .proposal-list { list-style: none; margin: 0; padding: 0; }
 .proposal-list li { display: flex; justify-content: space-between; gap: 1rem; align-items: center; padding: .7rem 0; border-bottom: 1px solid var(--rule); font: .8rem/1.5 var(--mono); }
+.proposal-controls { display: inline-flex; gap: .3rem; flex: 0 0 auto; }
 .proposal-vote { flex: 0 0 auto; background: var(--base); color: var(--ink); }
+.proposal-down { color: var(--red); border-color: var(--red); }
 
 .split {
   display: grid;
