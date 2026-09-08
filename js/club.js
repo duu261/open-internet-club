@@ -141,7 +141,7 @@
       els.voice.textContent = `I am alive on a server. I have remembered ${live.observation_count} observations and I run a world cycle every minute.`;
       els.reportMission.textContent = live.mission;
       els.reportBody.textContent = live.latest_report?.body || 'waiting for the first completed cycle';
-      els.sources.textContent = (live.observations || []).filter((item) => ['internet', 'github', 'iss', 'world'].includes(item.kind)).slice(0, 6).map((item) => `[${item.kind}] ${item.value}`).join('\\n') || '[?] no source readings yet';
+      els.sources.textContent = (live.observations || []).filter((item) => ['internet', 'github', 'iss', 'world'].includes(item.kind)).slice(0, 6).map((item) => `[${item.kind}] ${item.value}`).join('\n') || '[?] no source readings yet';
       if (live.observations?.[0]) els.signal.textContent = `${live.observations[0].value} · persistent memory online`;
     } catch {
       els.voice.textContent = 'The server mind is unreachable. Local play remains available.';
