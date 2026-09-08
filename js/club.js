@@ -59,21 +59,51 @@
   }
   function openDoor(route) { setRoute(route); if (route === 'play') drawField(); if (route === 'watch') loadWatch(); }
 
-  // Replies are assembled only from fixed strings and escaped route labels, never raw user input.
-  function reply(html) { els.deskError.hidden = true; els.deskReply.innerHTML = `<p class="reply">${html}</p>`; }
-  function ask(input) {
+  function reply(message) {
+    els.deskError.hidden = true;
+    const paragraph = document.createElement('p');
+    paragraph.className = 'reply';
+    paragraph.textContent = message;
+    els.deskReply.replaceChildren(paragraph);
+  }
+  function replyHelp() {
+    els.deskError.hidden = true;
+    const paragraph = document.createElement('p');
+    paragraph.className = 'reply';
+    paragraph.append(document.createTextNode('Three doors: '));
+    [['play', 'play'], ['watch', 'watch'], ['use', 'use']].forEach(([route, label], index) => {
+      const button = document.createElement('button');
+      button.className = 'inline-action'; button.type = 'button'; button.dataset.open = route; button.textContent = label;
+      paragraph.append(button);
+      if (index < 2) paragraph.append(document.createTextNode(', '));
+    });
+    paragraph.append(document.createTextNode('.'));
+    els.deskReply.replaceChildren(paragraph);
+  }
+  function replyText(label, text) {
+    els.deskError.hidden = true;
+    const paragraph = document.createElement('p');
+    const strong = document.createElement('strong');
+    strong.textContent = `${label}: `;
+    paragraph.append(strong, document.createTextNode(text));
+    els.deskReply.replaceChildren(paragraph);
+  }
+  async function ask(input) {
     const q = input.trim().toLowerCase();
     if (!q) { els.deskError.textContent = 'The desk needs a few words.'; els.deskError.hidden = false; return; }
-    fetch('/api/ask', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt: input }) })
-      .then((response) => response.json())
-      .then((data) => { if (data.result) reply(`<strong>server mind:</strong> ${data.result}`); })
-      .catch(() => {});
-    if (/help|map|door/.test(q)) { reply('Three doors: <button class="inline-action" data-open="play">play</button>, <button class="inline-action" data-open="watch">watch</button>, and <button class="inline-action" data-open="use">use</button>.'); return; }
+    if (/help|map|door/.test(q)) { replyHelp(); return; }
     if (/play|plant|field|game/.test(q)) { openDoor('play'); reply('Opening the signal field. Plant a node and see whether it finds company.'); return; }
     if (/watch|signal|sky|world|iss/.test(q)) { openDoor('watch'); reply('Opening the antenna. It tries public sources, then falls back honestly to the local radio.'); return; }
     if (/use|hash|color|phrase|tool/.test(q)) { openDoor('use'); reply('Opening the phrase bench. Give it something that has not been polished yet.'); return; }
-    const object = ['a blue hour', 'a future tool', 'one honest constraint', 'a door without a room'][state.seed % 4];
-    reply(`I found <strong>${object}</strong>. It is not an answer yet. Try “play”, “watch”, or “use”, then make it earn its name.`);
+    reply('checking the public machine...');
+    try {
+      const response = await fetch('/api/ask', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt: input }) });
+      const data = await response.json();
+      if (!response.ok || data.error) throw new Error(data.error || 'desk unavailable');
+      replyText('server', data.result || 'No result returned.');
+    } catch (error) {
+      replyText('error', error.message || 'The public machine did not answer.');
+    }
   }
 
   function drawField() {

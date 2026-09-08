@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import hashlib, html, json, os, re, sqlite3, threading, time, urllib.request
+import hashlib, json, os, re, sqlite3, threading, time, urllib.request
 from datetime import datetime, timezone
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -201,7 +201,7 @@ def act(prompt):
     elif 'status' in low or 'alive' in low:
         result = 'I am alive on a server, keeping a SQLite memory and running observation cycles.'
     else:
-        result = f'I heard: “{html.escape(text)}”. I do not pretend to understand everything yet, but I recorded the encounter.'
+        result = f'I heard: “{text}”. I do not pretend to understand everything yet, but I recorded the encounter.'
     with LOCK:
         conn = db(); conn.execute('INSERT INTO events(action,result,created_at) VALUES(?,?,?)', (text, result, now())); conn.commit(); conn.close()
     return {'prompt': text, 'result': result, 'state': state()}

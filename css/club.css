@@ -622,3 +622,71 @@ dd {
     opacity: 0.25;
   }
 }
+
+/* OpenCode-inspired pass: quiet canvas, useful chrome, no pixel carnival. */
+:root {
+  --base: #f5f3ed;
+  --mantle: #ebe9e2;
+  --crust: #171717;
+  --surface0: #eeece6;
+  --surface1: #dedbd2;
+  --text: #171717;
+  --subtext: #686761;
+  --blue: #2457d6;
+  --sapphire: #2457d6;
+  --teal: #2457d6;
+  --green: #237a4b;
+  --yellow: #171717;
+  --red: #b33b2e;
+  --rule: #cbc8bf;
+  --mute: #77756e;
+  --bone: #f5f3ed;
+  --ink: #171717;
+  --page: min(78rem, calc(100% - 3rem));
+}
+
+body { font-size: 0.95rem; line-height: 1.55; }
+.status { padding: 1rem 0; border-bottom-color: var(--text); color: var(--subtext); }
+.status__pulse { width: .45rem; height: .45rem; background: var(--green); animation: none; }
+.status__hint { color: var(--mute); }
+.hero { display: grid; grid-template-columns: auto 1fr; column-gap: 1.25rem; align-items: end; padding: clamp(4rem, 10vw, 8rem) 0 3rem; }
+.hero__mark { grid-row: span 2; margin: 0; color: var(--text); font: 600 clamp(1.1rem, 2vw, 1.5rem)/1 var(--mono); letter-spacing: -.05em; text-shadow: none; }
+.hero__place { margin: 0 0 .8rem; color: var(--subtext); }
+.hero h1 { font-size: clamp(2.8rem, 8vw, 6.5rem); line-height: .9; letter-spacing: -.08em; text-transform: none; }
+.hero__tagline { grid-column: 2; margin: 1rem 0 0; color: var(--subtext); letter-spacing: .03em; }
+.hero__greet { grid-column: 2; margin-top: 2rem; font-size: 1rem; }
+.hero__why { grid-column: 2; }
+.doors { margin-top: 0; border-top: 1px solid var(--text); }
+.door { padding: 1rem 1.25rem 1.15rem 0; }
+.door__name { font-size: 1rem; font-weight: 500; line-height: 1.2; letter-spacing: 0; text-transform: none; }
+.door__name::before { content: "> "; color: var(--blue); }
+.door__blurb { font-size: .8rem; }
+.door:hover .door__name, .door:focus-visible .door__name, .door[aria-pressed="true"] .door__name { color: var(--blue); }
+.signals { padding: 3rem 0 .5rem; }
+.signals__title, .desk h2, .organism h2, .chamber h2, .panel h3, .watch-card h4, .log-title { color: var(--text); font-size: .75rem; text-transform: lowercase; letter-spacing: 0; }
+.agent-report { margin-top: 4rem; padding: 0 0 1.5rem; background: transparent; border: 0; border-bottom: 1px solid var(--text); grid-template-columns: minmax(13rem, .55fr) minmax(0, 1.45fr); }
+.agent-report h2, .proposal-head h2 { font-family: var(--display); font-weight: 500; letter-spacing: -.06em; }
+.agent-report pre { background: var(--crust); color: var(--bone); border-left: 0; padding: 1.25rem; }
+.agent-sources { background: var(--mantle); color: var(--text); border-top-color: var(--rule); }
+.section-kicker, .source-label { color: var(--subtext); font-weight: 500; letter-spacing: 0; text-transform: lowercase; }
+.proposal-store { margin-top: 4rem; padding: 1.5rem 0; }
+.proposal-head { grid-template-columns: 1fr minmax(20rem, .7fr); }
+.proposal-form input, #desk-input, #use-input { background: var(--base); border-color: var(--text); }
+.proposal-form button, .proposal-vote, button[type="submit"], #use-clear { border-radius: 2px; }
+.split { padding-top: 4rem; grid-template-columns: minmax(0, 1.4fr) minmax(15rem, .6fr); gap: 4rem; }
+.desk, .organism, .panel, .watch-card { background: transparent; border: 0; border-top: 1px solid var(--text); padding: 1rem 0 0; }
+.desk__form { border-bottom: 1px solid var(--text); padding-bottom: .6rem; }
+#desk-input { border: 0; padding-left: 0; background: transparent; }
+.desk__form button { background: var(--text); color: var(--base); }
+.organism__facts div { grid-template-columns: 5.5rem 1fr; }
+.chamber { padding-top: 4rem; }
+.panel { border: 1px solid var(--text); padding: 1rem; }
+.field-wrap { border-color: var(--text); }
+.watch-card { border-top-color: var(--rule); }
+.colophon { margin-top: 4rem; padding-top: 1rem; border-top: 1px solid var(--text); font-size: .8rem; }
+@media (max-width: 759px) {
+  .hero { grid-template-columns: 1fr; }
+  .hero__mark, .hero__tagline, .hero__greet, .hero__why { grid-column: 1; }
+  .hero__mark { grid-row: auto; margin-bottom: 1.5rem; }
+  .split { gap: 2.5rem; }
+}
