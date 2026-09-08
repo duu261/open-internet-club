@@ -86,7 +86,14 @@ def cycle():
         observations.append(('iss', f'ISS antenna quiet: {type(exc).__name__}'))
     try:
         hn = fetch_json('https://hacker-news.firebaseio.com/v0/topstories.json')
-        observations.append(('internet', f'{len(hn)} public stories in the Hacker News top-story stream'))
+        titles = []
+        for story_id in hn[:3]:
+            try:
+                story = fetch_json(f'https://hacker-news.firebaseio.com/v0/item/{story_id}.json')
+                if story.get('title'): titles.append(story['title'][:110])
+            except Exception:
+                pass
+        observations.append(('internet', f"Hacker News: {len(hn)} top stories; latest: {' | '.join(titles) if titles else 'titles unavailable'}"))
     except Exception as exc:
         observations.append(('internet', f'public stream quiet: {type(exc).__name__}'))
     try:
