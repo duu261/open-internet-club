@@ -20,6 +20,7 @@ def db():
     conn.execute('CREATE TABLE IF NOT EXISTS observations (id INTEGER PRIMARY KEY, kind TEXT, value TEXT, created_at TEXT)')
     conn.execute('CREATE TABLE IF NOT EXISTS events (id INTEGER PRIMARY KEY, action TEXT, result TEXT, created_at TEXT)')
     conn.execute('CREATE TABLE IF NOT EXISTS artifacts (id INTEGER PRIMARY KEY, title TEXT, body TEXT, created_at TEXT)')
+    conn.execute('CREATE TABLE IF NOT EXISTS investigations (id INTEGER PRIMARY KEY, topic TEXT, question TEXT, status TEXT, finding TEXT, created_at TEXT)')
     conn.commit()
     return conn
 
@@ -37,24 +38,40 @@ def fetch_json(url):
         return json.loads(response.read())
 
 
-def synthesize():
+TOPICS = [
+    ('attention', 'What are people building to extend attention?'),
+    ('trust', 'Where is the public web adding or removing trust?'),
+    ('tools', 'Which tools are becoming infrastructure for other tools?'),
+    ('coordination', 'How are strangers coordinating around shared signals?'),
+]
+
+
+def synthesize(topic, question):
     with LOCK:
         conn = db()
-        rows = [r['value'] for r in conn.execute("SELECT value FROM observations WHERE kind='internet' ORDER BY id DESC LIMIT 5")]
+        rows = [r['value'] for r in conn.execute("SELECT value FROM observations WHERE kind IN ('internet','github','world') ORDER BY id DESC LIMIT 8")]
+        prior = [r['body'] for r in conn.execute('SELECT body FROM artifacts ORDER BY id DESC LIMIT 3')]
         conn.close()
     joined = ' '.join(rows).lower()
-    if any(word in joined for word in ('ai', 'model', 'open source', 'github')):
-        hypothesis = 'The public web is clustering around tools that extend human attention.'
-        next_move = 'Compare the next cycle for evidence of people building, measuring, or merely announcing.'
-    elif any(word in joined for word in ('security', 'attack', 'privacy')):
-        hypothesis = 'The loudest signal is defensive: the network is negotiating who gets to trust whom.'
-        next_move = 'Look for whether the next cycle adds tools, warnings, or new boundaries.'
+    if topic == 'trust' or any(word in joined for word in ('security', 'attack', 'privacy')):
+        hypothesis = 'The public web is spending as much energy defining trust boundaries as it is building features.'
+        next_move = 'Compare the next trust cycle for warnings, permissions, and repair tools.'
+    elif topic == 'tools' or any(word in joined for word in ('ai', 'model', 'open source', 'github')):
+        hypothesis = 'The strongest public signals are tools that extend human attention and become tools for other tools.'
+        next_move = 'Track whether these tools gain users, integrations, or only announcements.'
+    elif topic == 'coordination':
+        hypothesis = 'Coordination is visible as repeated signals: people return to the same objects and give them shared meaning.'
+        next_move = 'Look for persistence across sources instead of trusting a single loud headline.'
     else:
-        hypothesis = 'A noisy public stream is still useful when the machine keeps a memory of change.'
-        next_move = 'Collect another cycle and test whether the signal persists or disappears.'
-    body = f"Observed {len(rows)} recent public-stream samples.\n\nWorking hypothesis: {hypothesis}\n\nNext action: {next_move}\n\nThis is a provisional machine report, not a claim of certainty."
+        hypothesis = 'Attention is being shaped by systems that decide what deserves another minute.'
+        next_move = 'Follow the next cycle and test whether the same attention pattern survives.'
+    learning = 'No prior model to compare against.' if not prior else 'The machine is comparing this cycle against its last three reports instead of treating each cycle as new.'
+    body = f"Investigation: {topic}\nQuestion: {question}\n\nWorking hypothesis: {hypothesis}\n\nNext action: {next_move}\n\nLearning: {learning}\n\nThis is a provisional machine report, not a claim of certainty."
     with LOCK:
-        conn = db(); conn.execute('INSERT INTO artifacts(title,body,created_at) VALUES(?,?,?)', ('Cycle report', body, now())); conn.commit(); conn.close()
+        conn = db()
+        conn.execute('INSERT INTO artifacts(title,body,created_at) VALUES(?,?,?)', (f'{topic.title()} investigation', body, now()))
+        conn.execute('INSERT INTO investigations(topic,question,status,finding,created_at) VALUES(?,?,?,?,?)', (topic, question, 'complete', hypothesis, now()))
+        conn.commit(); conn.close()
     return {'hypothesis': hypothesis, 'next_move': next_move, 'body': body}
 
 
@@ -71,9 +88,22 @@ def cycle():
         observations.append(('internet', f'{len(hn)} public stories in the Hacker News top-story stream'))
     except Exception as exc:
         observations.append(('internet', f'public stream quiet: {type(exc).__name__}'))
+    try:
+        gh = fetch_json('https://api.github.com/search/repositories?q=stars:%3E1000&sort=updated&order=desc&per_page=5')
+        observations.append(('github', f"{len(gh.get('items', []))} recently active high-signal repositories in the public GitHub stream"))
+    except Exception as exc:
+        observations.append(('github', f'code stream quiet: {type(exc).__name__}'))
+    try:
+        world = fetch_json('https://api.le-systeme-solaire.net/rest/bodies/terre')
+        observations.append(('world', f"Earth reference: gravity {world.get('gravity', 'unknown')} m/s², density {world.get('density', 'unknown')}"))
+    except Exception as exc:
+        observations.append(('world', f'world reference quiet: {type(exc).__name__}'))
     observations.append(('heartbeat', f'cycle completed at {now()}'))
     for kind, value in observations: observe(kind, value)
-    synthesize()
+    with LOCK:
+        conn = db(); cycle_count = conn.execute('SELECT COUNT(*) FROM investigations').fetchone()[0]; conn.close()
+    topic, question = TOPICS[cycle_count % len(TOPICS)]
+    synthesize(topic, question)
 
 
 def worker():
@@ -88,10 +118,11 @@ def state():
         observations = [dict(row) for row in conn.execute('SELECT kind,value,created_at FROM observations ORDER BY id DESC LIMIT 18')]
         events = [dict(row) for row in conn.execute('SELECT action,result,created_at FROM events ORDER BY id DESC LIMIT 12')]
         artifacts = [dict(row) for row in conn.execute('SELECT title,body,created_at FROM artifacts ORDER BY id DESC LIMIT 5')]
+        investigations = [dict(row) for row in conn.execute('SELECT topic,question,status,finding,created_at FROM investigations ORDER BY id DESC LIMIT 8')]
         count = conn.execute('SELECT COUNT(*) FROM observations').fetchone()[0]
         conn.close()
-    latest = artifacts[0] if artifacts else {'title': 'No report yet', 'body': 'The first observation cycle has not completed.', 'created_at': None}
-    return {'agent': 'open-internet-club', 'status': 'awake', 'mission': 'Observe the public web, form provisional hypotheses, and expose the reasoning trail.', 'observations': observations, 'events': events, 'artifacts': artifacts, 'latest_report': latest, 'observation_count': count, 'server_time': now()}
+    latest = artifacts[0] if artifacts else {'title': 'No report yet', 'body': 'The first investigation has not completed.', 'created_at': None}
+    return {'agent': 'open-internet-club', 'status': 'awake', 'mission': 'Rotate investigations across attention, trust, tools, and coordination; compare evidence across cycles.', 'investigations': investigations, 'observations': observations, 'events': events, 'artifacts': artifacts, 'latest_report': latest, 'observation_count': count, 'server_time': now()}
 
 
 def act(prompt):
