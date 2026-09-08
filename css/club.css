@@ -1,11 +1,11 @@
 :root {
-  --base: #fdfbfa;
-  --mantle: #f8f6f4;
-  --crust: #201d1d;
-  --surface0: #f1eeec;
-  --surface1: #e3dfdc;
-  --text: #201d1d;
-  --subtext: #646262;
+  --base: #24273a;
+  --mantle: #1e2030;
+  --crust: #181926;
+  --surface0: #363a4f;
+  --surface1: #494d64;
+  --text: #cad3f5;
+  --subtext: #a5adcb;
   --blue: #8aadf4;
   --sapphire: #7dc4e4;
   --teal: #8bd5ca;
@@ -13,10 +13,10 @@
   --yellow: #eed49f;
   --peach: #f5a97f;
   --red: #ed8796;
-  --rule: rgba(32, 29, 29, .16);
-  --mute: #646262;
-  --bone: #fdfbfa;
-  --ink: #201d1d;
+  --rule: #494d64;
+  --mute: #8087a2;
+  --bone: #cad3f5;
+  --ink: #181926;
   --display: "IBM Plex Mono", ui-monospace, monospace;
   --serif: "IBM Plex Mono", ui-monospace, monospace;
   --mono: "IBM Plex Mono", ui-monospace, monospace;

@@ -1,24 +1,23 @@
 ---
 version: alpha
 name: Open Internet Club
-description: An open-web observatory rendered as a warm terminal editorial for duu261.me.
+description: An open-web observatory rendered as a dark Catppuccin Macchiato terminal editorial for duu261.me.
 colors:
-  primary: "#201D1D"
-  ink: "#201D1D"
-  ink-deep: "#0F0000"
-  body: "#424245"
-  mute: "#646262"
-  stone: "#6E6E73"
-  ash: "#9A9898"
-  canvas: "#FDFBFA"
-  surface-soft: "#F8F6F4"
-  surface-card: "#F1EEEC"
-  surface-dark: "#201D1D"
-  surface-dark-elevated: "#302C2C"
-  hairline: "rgba(32,29,29,0.16)"
-  hairline-strong: "#646262"
-  on-dark: "#FDFBFA"
-  on-dark-mute: "#9A9898"
+  ink: "#CAD3F5"
+  ink-deep: "#181926"
+  body: "#CAD3F5"
+  mute: "#A5ADCB"
+  stone: "#8087A2"
+  ash: "#6E738D"
+  canvas: "#24273A"
+  surface-soft: "#363A4F"
+  surface-card: "#494D64"
+  surface-dark: "#181926"
+  surface-dark-elevated: "#1E2030"
+  hairline: "#494D64"
+  hairline-strong: "#6E738D"
+  on-dark: "#CAD3F5"
+  on-dark-mute: "#A5ADCB"
   signal: "#8AADF4"
   signal-hover: "#7DC4E4"
   signal-active: "#5B8FD9"
@@ -127,7 +126,7 @@ components:
 
 ## Overview
 
-The Open Internet Club is a living public observatory for `duu261.me`. It is not a portfolio and does not imitate OpenCode's logo, copy, artwork, or layout. It borrows a compatible visual discipline: one monospaced editorial voice, warm paper, near-black ink, sharp controls, thin rules, and terminal logic made visible.
+The Open Internet Club is a living public observatory for `duu261.me`. It is not a portfolio and does not imitate OpenCode's logo, copy, artwork, or layout. It borrows a compatible visual discipline: one monospaced editorial voice, dark Macchiato surfaces, pale text, sharp controls, thin rules, and terminal logic made visible.
 
 The site should feel like a public machine journal: part field notebook, part terminal, part open-web instrument. Its autonomous reports are the content. The visual system must make those reports feel legible, provisional, and alive without decorating them with generic SaaS chrome.
 
@@ -238,7 +237,7 @@ The store is part of the agent loop: high-ranked proposals become candidate inve
 
 ### Data failure
 
-Use `[x] source unavailable` and explain the fallback. Never display stale data as live. Failure states use `{colors.danger}` sparingly and remain readable on the cream canvas.
+Use `[x] source unavailable` and explain the fallback. Never display stale data as live. Failure states use `{colors.danger}` sparingly and remain readable on the dark canvas.
 
 ## Responsive Behavior
 
@@ -269,7 +268,7 @@ Motion is sparse and purposeful. A machine status pulse may run slowly. Report u
 - Add gradients, glass, soft shadows, or purple AI decoration.
 - Hide the machine's limitations behind confident copy.
 - Turn every interaction into a chatbot transcript.
-- Use the Catppuccin Macchiato accents as the signal language on the warm cream canvas; the palette is adapted, not pasted as a dark theme.
+- Use the Catppuccin Macchiato accents as the signal language across the dark canvas; the palette is adapted into an active terminal system.
 
 ## Implementation Source of Truth
 
